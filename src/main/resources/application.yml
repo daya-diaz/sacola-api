@@ -17,3 +17,10 @@ spring:
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
+
+  # Configurações RabbitMQ
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest

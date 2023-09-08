@@ -96,6 +96,4 @@ No Terminal/Console:
  <sub><b>Dayane Santos</b></sub></a> <a href="https://www.instagram.com/_daydmelo/" title="Instagram"></a>
 
 Feito com ❤️ por Dayane! 👋🏽 Entre em contato!
-
-[![Linkedin Badge](https://media.licdn.com/dms/image/D4D03AQHYWois-YKo7g/profile-displayphoto-shrink_800_800/0/1693420836237?e=1698883200&v=beta&t=rXN66LKYdqnnKl_XqWFjuEPV7zbZdZPpCVhRBHs1FDQ)](https://www.linkedin.com/in/dayane-santos-melo/)
 <hr>

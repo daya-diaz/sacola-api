@@ -96,5 +96,41 @@ public class SacolaServiceImpl  implements SacolaService {
         sacola.setFechada(true);
         return sacolaRepository.save(sacola);
     }
+
+    @Override
+    public void excluirItemDaSacola(Long sacolaId, Long itemId) {
+        Sacola sacola = sacolaRepository.findById(sacolaId).orElseThrow(() -> new RuntimeException("Sacola não encontrada."));
+
+        if (sacola.isFechada()) {
+            throw new RuntimeException("A sacola já foi fechada.");
+        }
+
+        Item itemParaRemover = null;
+
+        // Encontre o item na sacola pelo ID
+        for (Item item : sacola.getItens()) {
+            if (item.getId() == (itemId)) {
+                itemParaRemover = item;
+                break;
+            }
+        }
+
+        if (itemParaRemover != null) {
+            // Remova o item da lista de itens
+            if(itemParaRemover.getQuantidade() > 1){
+                itemParaRemover.setQuantidade(itemParaRemover.getQuantidade() - 1);
+            }else{
+                sacola.getItens().remove(itemParaRemover);
+            }
+
+            // Atualize o valor total da sacola subtraindo o valor do item
+            double valorItem = itemParaRemover.getProduto().getValorUnitario();
+            double novoValorTotal = sacola.getValorTotal() - valorItem;
+            sacola.setValorTotal(novoValorTotal);
+            sacolaRepository.save(sacola);
+        } else {
+            throw new RuntimeException("Item não encontrado na sacola.");
+        }
+    }
 }
 

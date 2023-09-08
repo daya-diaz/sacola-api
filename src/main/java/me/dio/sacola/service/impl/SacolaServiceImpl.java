@@ -2,7 +2,6 @@ package me.dio.sacola.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import me.dio.sacola.enumeration.FormaPagamento;
-import me.dio.sacola.message.SacolaMensagem;
 import me.dio.sacola.model.Item;
 import me.dio.sacola.model.Restaurante;
 import me.dio.sacola.model.Sacola;
@@ -11,27 +10,17 @@ import me.dio.sacola.repository.SacolaRepository;
 import me.dio.sacola.repository.ProdutoRepository;
 import me.dio.sacola.resource.dto.ItemDto;
 import me.dio.sacola.service.SacolaService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
-
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class SacolaServiceImpl implements SacolaService {
-    private final RabbitTemplate rabbitTemplate;
+public class SacolaServiceImpl  implements SacolaService {
     private final SacolaRepository sacolaRepository;
     private final ProdutoRepository produtoRepository;
-
-    @Autowired
-    public SacolaServiceImpl(SacolaRepository sacolaRepository, RabbitTemplate rabbitTemplate, ProdutoRepository produtoRepository){
-        this.sacolaRepository = sacolaRepository;
-        this.rabbitTemplate = rabbitTemplate;
-        this.produtoRepository = produtoRepository;
-    }
+    private final ItemRepository itemRepository;
     @Override
     public Item incluirItemNaSacola(ItemDto itemDto) {
         Sacola sacola = verSacola(itemDto.getSacolaId());
@@ -78,7 +67,6 @@ public class SacolaServiceImpl implements SacolaService {
         for(Double valorItem : valorDosItens) {
             valorTotalSacola += valorItem;
         }
-
         sacola.setValorTotal(valorTotalSacola);
         //sacolaRepository é o que vai ter contato direto com o banco de dados; (?)
         sacolaRepository.save(sacola);
@@ -106,54 +94,7 @@ public class SacolaServiceImpl implements SacolaService {
 
         sacola.setFormaPagamento(formaPagamento);
         sacola.setFechada(true);
-
-        enviarMensagemParaFila(sacola, numeroFormaPagamento);
-
         return sacolaRepository.save(sacola);
     }
-    
-    @Override
-    public void excluirItemDaSacola(Long sacolaId, Long itemId) {
-        Sacola sacola = sacolaRepository.findById(sacolaId).orElseThrow(() -> new RuntimeException("Sacola não encontrada."));
-
-        if (sacola.isFechada()) {
-            throw new RuntimeException("A sacola já foi fechada.");
-        }
-
-        Item itemParaRemover = null;
-
-        // Encontre o item na sacola pelo ID
-        for (Item item : sacola.getItens()) {
-            if (item.getId() == (itemId)) { // Use equals para comparar objetos Long
-                itemParaRemover = item;
-                break;
-            }
-        }
-
-        if (itemParaRemover != null) {
-            // Remova o item da lista de itens
-            if(itemParaRemover.getQuantidade() > 1){
-                itemParaRemover.setQuantidade(itemParaRemover.getQuantidade() - 1);
-            }else{
-                sacola.getItens().remove(itemParaRemover);
-            }
-
-            // Atualize o valor total da sacola subtraindo o valor do item
-            double valorItem = itemParaRemover.getProduto().getValorUnitario();
-            double novoValorTotal = sacola.getValorTotal() - valorItem;
-            sacola.setValorTotal(novoValorTotal);
-            sacolaRepository.save(sacola);
-        } else {
-            throw new RuntimeException("Item não encontrado na sacola.");
-        }
-    }
-    @Override
-    public void enviarMensagemParaFila(Sacola sacola, int formaPagamento) {
-        // criar uma instância da mensagem que você deseja enviar para a fila
-        SacolaMensagem mensagem = new SacolaMensagem(sacola.getId(), formaPagamento);
-
-        // usar rabbitTemplate para enviar a mensagem para a fila
-        rabbitTemplate.convertAndSend("fila-de-pedidos-clientes", mensagem);
-    }
-    }
+}
 

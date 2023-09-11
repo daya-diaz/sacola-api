@@ -16,6 +16,7 @@
 - [x] Visualizar sacola<br>
 - [x] Fechar sacola<br>
 - [x] Excluir item da sacola<br>
+- [ ] Integrar com o RabbitMQ
 
 <h3>Demostração da Aplicação</h3>
 <p>Antes de começar, você precisará ter instalado em sua máquina as seguintes ferramentas:</p>

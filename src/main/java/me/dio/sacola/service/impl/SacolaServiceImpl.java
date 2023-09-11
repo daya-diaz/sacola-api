@@ -2,6 +2,7 @@ package me.dio.sacola.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import me.dio.sacola.enumeration.FormaPagamento;
+import me.dio.sacola.events.PedidoFechadoEvent;
 import me.dio.sacola.model.Item;
 import me.dio.sacola.model.Restaurante;
 import me.dio.sacola.model.Sacola;
@@ -105,9 +106,9 @@ public class SacolaServiceImpl  implements SacolaService {
         sacolaRepository.save(sacola);
 
         String routingKey = "sacola.v1.pedidos-clientes";
-        Message message = new Message(sacola.getId().toString().getBytes());
+        PedidoFechadoEvent event = new PedidoFechadoEvent(sacola.getId(), sacola.getValorTotal());
         
-        rabbitTemplate.send(routingKey, message);
+        rabbitTemplate.convertAndSend(routingKey, event);
         return sacola;
     }
 

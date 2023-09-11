@@ -11,8 +11,6 @@ import me.dio.sacola.enumeration.FormaPagamento;
 import javax.persistence.*; // Importações relacionadas à persistência de dados
 import java.util.List;
 
-import javax.persistence.*;
-
 @AllArgsConstructor // cria um constructor com todas os atributos;
 @Builder //designpatters que ajuda na hora de criar os objetos da Classe.
 @Data //trás todos os getters e setters dos atributos que tinha feito na mão;

@@ -6,13 +6,11 @@ import me.dio.sacola.events.PedidoFechadoEvent;
 import me.dio.sacola.model.Item;
 import me.dio.sacola.model.Restaurante;
 import me.dio.sacola.model.Sacola;
-import me.dio.sacola.repository.ItemRepository;
 import me.dio.sacola.repository.SacolaRepository;
 import me.dio.sacola.repository.ProdutoRepository;
 import me.dio.sacola.resource.dto.ItemDto;
 import me.dio.sacola.service.SacolaService;
 
-import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,7 +23,6 @@ import java.util.List;
 public class SacolaServiceImpl  implements SacolaService {
     private final SacolaRepository sacolaRepository;
     private final ProdutoRepository produtoRepository;
-    private final ItemRepository itemRepository;
 
     @Autowired
     private RabbitTemplate rabbitTemplate;

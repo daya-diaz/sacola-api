@@ -10,6 +10,10 @@ import me.dio.sacola.repository.SacolaRepository;
 import me.dio.sacola.repository.ProdutoRepository;
 import me.dio.sacola.resource.dto.ItemDto;
 import me.dio.sacola.service.SacolaService;
+
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -21,6 +25,10 @@ public class SacolaServiceImpl  implements SacolaService {
     private final SacolaRepository sacolaRepository;
     private final ProdutoRepository produtoRepository;
     private final ItemRepository itemRepository;
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
     @Override
     public Item incluirItemNaSacola(ItemDto itemDto) {
         Sacola sacola = verSacola(itemDto.getSacolaId());
@@ -94,7 +102,13 @@ public class SacolaServiceImpl  implements SacolaService {
 
         sacola.setFormaPagamento(formaPagamento);
         sacola.setFechada(true);
-        return sacolaRepository.save(sacola);
+        sacolaRepository.save(sacola);
+
+        String routingKey = "sacola.v1.pedidos-clientes";
+        Message message = new Message(sacola.getId().toString().getBytes());
+        
+        rabbitTemplate.send(routingKey, message);
+        return sacola;
     }
 
     @Override

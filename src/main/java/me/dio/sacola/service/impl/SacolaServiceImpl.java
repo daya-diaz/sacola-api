@@ -104,9 +104,8 @@ public class SacolaServiceImpl  implements SacolaService {
         sacola.setFormaPagamento(formaPagamento);
         sacola.setFechada(true);
         sacolaRepository.save(sacola);
-
         String routingKey = "sacola.v1.pedidos-clientes";
-        PedidoFechadoEvent event = new PedidoFechadoEvent(sacola.getId(), sacola.getValorTotal());
+        PedidoFechadoEvent event = new PedidoFechadoEvent(sacola.getId(), sacola.getValorTotal(), sacola.getItens(),  sacola.getFormaPagamento());
         
         rabbitTemplate.convertAndSend(routingKey, event);
         return sacola;

@@ -42,4 +42,10 @@ public class SacolaResource {
         }
     }
 
+    @PostMapping("/cliente/{clienteId}")
+    public ResponseEntity<Sacola> criarSacolaParaCliente(@PathVariable Long clienteId) {
+        Sacola sacola = sacolaService.criarSacolaParaCliente(clienteId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(sacola);
+    }
+
 }

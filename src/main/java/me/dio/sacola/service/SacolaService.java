@@ -1,5 +1,6 @@
 package me.dio.sacola.service;
 
+import me.dio.sacola.model.Cliente;
 import me.dio.sacola.model.Item;
 import me.dio.sacola.model.Sacola;
 import me.dio.sacola.resource.dto.ItemDto;
@@ -11,4 +12,7 @@ public interface SacolaService {
     Sacola fecharSacola(Long id, int formaPagamento);
 
     void excluirItemDaSacola(Long sacolaId, Long itemId);
+
+    Sacola criarSacolaParaCliente(Long clienteId);
+
 }

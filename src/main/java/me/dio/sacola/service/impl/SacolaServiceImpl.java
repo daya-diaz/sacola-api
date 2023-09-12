@@ -3,10 +3,12 @@ package me.dio.sacola.service.impl;
 import lombok.RequiredArgsConstructor;
 import me.dio.sacola.enumeration.FormaPagamento;
 import me.dio.sacola.events.PedidoFechadoEvent;
+import me.dio.sacola.model.Cliente;
 import me.dio.sacola.model.Item;
 import me.dio.sacola.model.Restaurante;
 import me.dio.sacola.model.Sacola;
 import me.dio.sacola.repository.SacolaRepository;
+import me.dio.sacola.repository.ClienteRepository;
 import me.dio.sacola.repository.ProdutoRepository;
 import me.dio.sacola.resource.dto.ItemDto;
 import me.dio.sacola.service.SacolaService;
@@ -18,11 +20,14 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.EntityNotFoundException;
+
 @Service
 @RequiredArgsConstructor
 public class SacolaServiceImpl  implements SacolaService {
     private final SacolaRepository sacolaRepository;
     private final ProdutoRepository produtoRepository;
+    private final ClienteRepository clienteRepository;
 
     @Autowired
     private RabbitTemplate rabbitTemplate;
@@ -110,6 +115,7 @@ public class SacolaServiceImpl  implements SacolaService {
 
     @Override
     public void excluirItemDaSacola(Long sacolaId, Long itemId) {
+
         Sacola sacola = sacolaRepository.findById(sacolaId).orElseThrow(() -> new RuntimeException("Sacola não encontrada."));
 
         if (sacola.isFechada()) {
@@ -142,6 +148,25 @@ public class SacolaServiceImpl  implements SacolaService {
         } else {
             throw new RuntimeException("Item não encontrado na sacola.");
         }
+    }
+
+    @Override
+    public Sacola criarSacolaParaCliente(Long clienteId) {
+        Cliente cliente = clienteRepository.findById(clienteId)
+            .orElseThrow(() -> new EntityNotFoundException("Cliente não encontrado com ID: " + clienteId));
+        
+        Sacola sacolaExistente = sacolaRepository.findByClienteAndFechadaIsFalse(cliente);
+        if(sacolaExistente != null) {
+            throw new RuntimeException("O cliente já possui uma sacola em aberto.");
+        }
+
+        Sacola novaSacola = new Sacola();
+        novaSacola.setCliente(cliente);
+        novaSacola.setFechada(false);
+
+        novaSacola = sacolaRepository.save(novaSacola);
+        return novaSacola;
+
     }
 }
 
